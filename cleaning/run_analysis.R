@@ -32,11 +32,10 @@ extract_index <- c(extract_index,ncol(one_data)-1, ncol(one_data))
 sub_one_data <- one_data[,extract_index]
 
 # clean up the workspace
-#rm(one_data,xtest,xtrain,ytest,ytrain,stest,strain)
+rm(one_data,xtest,xtrain,ytest,ytrain,stest,strain)
 
 # label dataset with descriptive names
 col_names <- table_names[extract_index,2]
-#col_names <- replace(col_names, is.na(col_names), 'activity')
 col_names[80]<-'activity'
 col_names[81]<-'subjec'
 colnames(sub_one_data) <- col_names
@@ -45,11 +44,10 @@ colnames(sub_one_data) <- col_names
 key <- read.table('activity_labels.txt')
 sub_one_data[["activity"]] <- key[ match(sub_one_data[['activity']], key[['V1']] ) , 'V2']
 View(sub_one_data)
+
 # create a new independent data set based on unique activites and users by 
 # averages
-
 user_activities <- group_by(sub_one_data, subjects, activity)
-View(user_activities,'ua')
 tidy_data <- summarise_each(user_activities, funs(mean))
-
+write.table(tidy_data,file='tidy_data.txt', row.names = FALSE)
 
