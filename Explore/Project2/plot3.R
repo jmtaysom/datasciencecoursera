@@ -25,7 +25,7 @@ rm(list=ls())
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-## summarise the data to find the total emissions (in millions of tons) per year
+## summarise the data to find the total emissions (in thousands of tons) per year
 Baltimore <- NEI[NEI$fips=='24510',]
 totals <- ddply(Baltimore,.(year, type), summarise, Emissions=sum(Emissions))
 totals$Emissions <- totals$Emissions/1000
