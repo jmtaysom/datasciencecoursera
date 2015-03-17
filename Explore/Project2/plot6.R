@@ -27,17 +27,18 @@ SCC <- readRDS("Source_Classification_Code.rds")
 
 ## summarise the data to find the total emissions (in millions of tons) per year
 # Baltimore <- NEI[NEI$fips=='24510',]
-coalsn <- SCC[grepl("Coal", SCC$Short.Name), ]
-coal <- NEI[NEI$SCC %in% coalsn$SCC,] 
-totals <- ddply(coal,.(year), summarise, Emissions=sum(Emissions))
-totals$Emissions <- totals$Emissions/1000
+vehiclesSCC <- SCC[grepl("Vehicle", SCC$SCC.Level.Two), ]
+vehicles <- NEI[NEI$SCC %in% vehiclesSCC$SCC,] 
+Baltimore_vehicles <- vehicles[vehicles$fips == '24510',]
+totals <- ddply(Baltimore_vehicles,.(year), summarise, Emissions=sum(Emissions))
+#totals$Emissions <- totals$Emissions/1000
 
 ## Plot the emissions over time and add a linear regression line
-png(file="plot4.png",width=480,height=480)
+png(file="plot5.png",width=480,height=480)
 g <- ggplot(totals, aes(year, Emissions)) 
 g + geom_point() + geom_smooth(method='lm', se=FALSE) + 
-  labs(title='PM 2.5 Emissions from Coal Combustion',
-       y='Emission in thousand tons', x="Year") +
+  labs(title='PM 2.5 Emissions from Vehicles in Baltimore',
+       y='Emission in tons', x="Year") +
   scale_x_continuous(breaks=c(1999,2002,2005,2008))
 
 dev.off()
