@@ -1,20 +1,27 @@
 ---
-title: "Reproducible Research Assignment 2"
+title: "Severe Weather Events of Greatest Impact"
 author: "jmtaysom"
 date: "April 23, 2015"
 output: html_document
 ---
+## Severe Weather Events of Greatest Impact
+Synopsis: This project examines NOAA's storm database in an attempt to analyze
+the storms and identify those with the greatest impact. There are two categories
+that will be the main focus: greatest property damage and most harmful to human
+health.
 
-This 
+## Data Processing
 
-```{r}
+```{r, cache=TRUE}
 url = 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
 zip = 'Storm_Data.csv.bz2'
 download.file(url, zip, method='curl')
-
+rm(url)
+storm <- read.csv(bzfile(zip))
+rm(zip)
 ```
 
-You can also embed plots, for example:
+##Results
 
 ```{r}
 
