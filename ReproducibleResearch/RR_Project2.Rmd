@@ -8,7 +8,8 @@ output: html_document
 Synopsis: This project examines NOAA's storm database in an attempt to analyze
 the storms and identify those with the greatest impact. There are two categories
 that will be the main focus: greatest property damage and most harmful to human
-health.
+health. As seen in the results Tornadoes harm the most people while flooding and 
+huricanes do the most property damage.
 
 ## Data Processing
 
@@ -42,7 +43,7 @@ storm$PROPDMG <- storm$PROPDMG * as.numeric(storm$PROPDMGEXP) / 1000000000
 
 Sumarize the injuries and fatalities by event type and display the most damaging
 events. In the top 6 there are 5 different event types with tornadoes taking
-two of the stops since more people died from tornadoes than were injured by the 
+two of the spots since more people died from tornadoes than were injured by the 
 next most serious weather type.
 ```{r}
 human.damage <- ddply(storm, "EVTYPE", summarize, injuries = sum(INJURIES), fatalities = sum(FATALITIES))
@@ -52,7 +53,8 @@ top.hd <- tail(arrange(hd.m, value), n=6)
 top.hd
 ```
 
-Sumarize the total damage by event type
+Sumarize the total damage by event type and select the top three which happen to
+do an order of magnitude more damage than the next few.
 ```{r}
 prop.damage <- ddply(storm, "EVTYPE", summarize, propdmg = sum(PROPDMG))
 prop.damage <- prop.damage[complete.cases(prop.damage),]
@@ -60,8 +62,17 @@ top.prop <-tail(arrange(prop.damage, propdmg), n=3)
 ```
 ##Results
 
+Tornadoes are by far the greatest threat to human health. Tornado fatalities 
+rank 5th in the most people effected by weather and there are more than 10 times
+the number of injuries from tornadoes as any other other weather event.
 ```{r}
-ggplot(top.hd, aes(x=EVTYPE, y=value,fill=variable)) + geom_bar(stat='identity') + labs(x="Storm Type", y="People injured and killed")
+ggplot(top.hd, aes(reorder(x=EVTYPE, -value), y=value,fill=variable)) + geom_bar(stat='identity') + labs(x="Storm Type", y="People injured and killed")
+```
+
+Floods and huricanes are the weather events that do the most property damage. 
+The top three property damaging weather events do an order of magnitude more 
+damage than any of the other events.
+```{r}
 ggplot(top.prop, aes(x=EVTYPE, y=propdmg)) + geom_bar(stat='identity') + labs(x="Storm Type", y="Property Damage in Billions of Dollars")
 ```
 
