@@ -11,44 +11,58 @@ that will be the main focus: greatest property damage and most harmful to human
 health.
 
 ## Data Processing
+
+Load the appropriate libraries.
 ```{r}
 library(ggplot2)
 library(reshape2)
 library(plyr)
 ```
 
+Download and open the storm dataset.
 ```{r, cache=TRUE}
+setwd("~/datasciencecoursera/ReproducibleResearch")
 url = 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
 zip = 'Storm_Data.csv.bz2'
-download.file(url, zip, method='curl')
+#download.file(url, zip, method='curl')
 rm(url)
-storm <- read.csv(bzfile(zip), nrows=5000)
+storm <- read.csv(bzfile(zip))
 rm(zip)
 ```
-remap the values of the damage levels to numeric and calculate the total damage
+
+Calculate the total damagein billions of dollars by converting the character
+descriptions of the magnitude of damage into numeric and then applying it to the
+value of the damage.
 ```{r}
-storm$PROPDMGEXP <-revalue(storm$PROPDMGEXP, c("K"="1000", "M"="1000000"))# "B"=1000000000))
+storm$PROPDMGEXP <-revalue(storm$PROPDMGEXP, c("K"="1000", "M"="1000000", "B"="1000000000"))
 storm$PROPDMGEXP <- sub("^$", "1", storm$PROPDMGEXP)
-storm$PROPDMG <- storm$PROPDMG * as.numeric(storm$PROPDMGEXP)
-View(storm)
+storm$PROPDMG <- storm$PROPDMG * as.numeric(storm$PROPDMGEXP) / 1000000000
+
 ```
 
-Sumarize the injuries and fatalities by event type
+Sumarize the injuries and fatalities by event type and display the most damaging
+events. In the top 6 there are 5 different event types with tornadoes taking
+two of the stops since more people died from tornadoes than were injured by the 
+next most serious weather type.
 ```{r}
 human.damage <- ddply(storm, "EVTYPE", summarize, injuries = sum(INJURIES), fatalities = sum(FATALITIES))
 hd.m <- melt(human.damage, id.vars='EVTYPE')
-
+hd.m <- hd.m[complete.cases(hd.m),]
+top.hd <- tail(arrange(hd.m, value), n=6)
+top.hd
 ```
 
 Sumarize the total damage by event type
 ```{r}
 prop.damage <- ddply(storm, "EVTYPE", summarize, propdmg = sum(PROPDMG))
+prop.damage <- prop.damage[complete.cases(prop.damage),]
+top.prop <-tail(arrange(prop.damage, propdmg), n=3)
 ```
 ##Results
 
 ```{r}
-ggplot(hd.m, aes(x=EVTYPE, y=value,fill=variable)) + geom_bar(stat='identity')
-ggplot(prop.damage, aes(x=EVTYPE, y=propdmg)) + geom_bar(stat='identity')
+ggplot(top.hd, aes(x=EVTYPE, y=value,fill=variable)) + geom_bar(stat='identity') + labs(x="Storm Type", y="People injured and killed")
+ggplot(top.prop, aes(x=EVTYPE, y=propdmg)) + geom_bar(stat='identity') + labs(x="Storm Type", y="Property Damage in Billions of Dollars")
 ```
 
 
