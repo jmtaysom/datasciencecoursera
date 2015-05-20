@@ -19,3 +19,8 @@ for (i in 1:1000) expn = c(expn, mean(rexp(40,.2)))
 xdf <- data.frame(expn)
 x <- ggplot(xdf,aes(x=expn))
 x + geom_histogram(aes(fill = ..count..))
+
+norm <-rnorm(1000,mean=5, sd = 5/sqrt(40))
+ndf <- data.frame(norm)
+n <- ggplot(ndf, aes(x=norm))
+n + geom_histogram(aes(fill = ..count..))
