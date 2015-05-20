@@ -2,6 +2,6 @@
 title: "Statistical Inference Project"
 author: "jmtaysom"
 date: "05/08/2015"
-output: html_document
+output: pdf_document
 ---
 
