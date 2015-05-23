@@ -4,4 +4,20 @@ author: "jmtaysom"
 date: "05/08/2015"
 output: pdf_document
 ---
+```{r load.data, echo=FALSE, results='hide'}
+library(ggplot2)
+library(grid)
+library(gridExtra)
+
+set.seed(0)
+lambda <- 0.2
+observations <- 40
+trials <- 1000
+
+expn = NULL
+for (i in 1:trials) expn = c(expn, mean(rexp(observations, lambda)))
+
+norm <- rnorm(trials,mean=1/lambda, sd = (1/lambda)/sqrt(observations))
+```
+
 
