@@ -1,5 +1,5 @@
 ---
-title: "Statistical Inference Project"
+title: "Statistical Inference Project: Part 1"
 author: "jmtaysom"
 date: "05/08/2015"
 output:
@@ -34,15 +34,48 @@ In this report we will explore the Central Limit Therom and how it applys to mul
 In this experiment we will be comparing the distribution of the of `r trials`  means of samples of `r observations` exponential numbers to their expected distribution through the use of the central limit therom. The poultaion of exponential numbers will have a mean and standard deviation of $\frac{1}{\lambda}$ or $\frac{1}{0.2}=`r 1/lambda`$. The standard deviation of the sample will be equal to $\frac{\sigma}{\sqrt{`r observations`}}$ on in this case `r (1/lambda)/sqrt(observations)`.
 
 # Calculations
-Upon sampling the exponential numbers we can start comparing them to the expected values. The expected mean of the samples is `r exmean` while the observed mean is `r acmean`. The expected standard deviation is `r exsigma` and the observed standard deviation is `r acsigma`. With the observed mean and standard deviation so close to the expected mean and standard deviation we can see that the central limit therom governs this dataset
+## Comparing to expected values
+Upon sampling the exponential numbers we can start comparing them to the expected values. The expected mean of the samples is `r exmean` while the observed mean is `r acmean` as seen in Figure 1 in the appendix. The expected variance is `r exsigma^2` and the observed variance is `r acsigma^2`. However with the sample size being `r observations` the variance is much smaller than the variance of the population. The variance of the population would be $(\frac{1}{\lambda})^2$ or `r (1/lambda)^2` which is  greater than the observed variance as seen in figure 2 in the appendix.  With the observed mean and variance so close to the expected mean and standard deviation we can see that the central limit therom governs this dataset.
 
-```{r graph_expn, echo=FALSE}
-xdf <- data.frame(expn)
-x <- ggplot(xdf,aes(x=expn))
-x + geom_histogram(aes(fill = ..count..)) + geom_vline(xintercept = mean(expn), color='red') + geom_vline(xintercept = 1/lambda, color='black') + ggtitle('Expected Mean (black) vs. Actual Mean (red)' )
-```
+## Comparing to normal data
+While the distibution of exponential numbers is not normal the distribution of the mean of the samples should be normal. This can be tested by comparing the distibution of the samples to the distribution of the same number of random normal numbers that have a mean and standard deviation equal to that of the samples of exponential numbers. The result as seen in figure 3 show that distibution of the means of the samples of exponential numbers are distributed normally.
 
 # Appendix
+
+## Figures
+
+### Figure 1
+Histogram of the sampled expoential numbers with the expected mean and actual mean
+```{r graph_expn}
+xdf <- data.frame(expn)
+x <- ggplot(xdf,aes(x=expn)) + geom_histogram(aes(fill = ..count..), binwidth=.25) + xlim(2,8) +ylim(0,150)
+x + geom_vline(xintercept = mean(expn), color='red') + geom_vline(xintercept = 1/lambda, color='black') + ggtitle('Expected Mean (black) vs. Actual Mean (red)' )
+```
+
+### Figure 2
+The variance of the sample is smaller than the variance of the poplutation
+```{r graph_distributions}
+norm <-rnorm(1000,mean=5, sd = 5)
+ndf <- data.frame(norm)
+ndf$distribution <- 'population'
+names(ndf)[names(ndf)=="norm"] <- "value"
+xdf$distribution <- 'sample'
+names(xdf)[names(xdf)=="expn"] <- "value"
+combined <- rbind(xdf,ndf)
+
+ggplot(combined, aes(x=value, colour=distribution)) + geom_density() +ggtitle('Sample Variance vs. Population Variance')
+```
+
+### Figure 3
+Comparing the distribution of the samples to a normal distribution
+```{r graph_normal}
+norm <-rnorm(1000,mean=5, sd = 5/sqrt(40))
+ndf <- data.frame(norm)
+n <- ggplot(ndf, aes(x=norm)) + geom_histogram(aes(fill = ..count..), binwidth=.25) + xlim(2,8) +ylim(0,150)
+
+grid.arrange(x,n, ncol=2, main='Exponential distribution vs. normal distribution')
+```
+
 
 ## Loading Data
 Here we set the seed to verify the reproducibility of the results. Set the variables according to the experiment. And create two samples; one for `r trials` of the mean of `r observations` exponential numbers, and one for `r trials` of normal numbers that have a mean and sd equal to the exponential numbers.
