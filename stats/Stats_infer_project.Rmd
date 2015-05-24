@@ -2,13 +2,15 @@
 title: "Statistical Inference Project"
 author: "jmtaysom"
 date: "05/08/2015"
-output: pdf_document
+output:
+  pdf_document: default
 ---
-```{r load.data, echo=FALSE, results='hide'}
+```{r load.library, echo=FALSE, results='hide'}
 library(ggplot2)
 library(grid)
 library(gridExtra)
-
+```
+```{r load.data, echo=FALSE, results='hide'}
 set.seed(0)
 lambda <- 0.2
 observations <- 40
@@ -17,10 +19,32 @@ trials <- 1000
 expn = NULL
 for (i in 1:trials) expn = c(expn, mean(rexp(observations, lambda)))
 
+exsigma <- (1/lambda)/sqrt(observations)
+exmean <- (1/lambda)
+acsigma <- sd(expn)
+acmean <- mean(expn)
+
 norm <- rnorm(trials,mean=1/lambda, sd = (1/lambda)/sqrt(observations))
 ```
 
 # Executive summary
-In this report we will explore the Central Limit Therom and how it applys to multiple draws of a sample from a population. Specifically we will look at how `r observations` means of draws of sample of size `r observations` random exponential numbers with a lambda of `r lambda` compares to `r trials` random normal observations. The random normal numbers will have a mean and standard deviation equivilant to the theoretical mean and standard deviation that we would expect for the exponential numbers. The mean and standard deviation of the population of eponential numbers are both equal to $\frac{1}{\lambda}$ or in ths case equal to `r 1/lambda`. The theoretical standard deviation of the sample will be equal to $\frac{\sigma}{\sqrt{`r observations`}}$ on in this case `r (1/lambda)/sqrt(observations)`. The actuall mean of the `r observations` is `r mean(expn)` and the standard deviation is `r sd(expn)` show that the observed values are representitive of the population according to the Central Limit Therom.
+In this report we will explore the Central Limit Therom and how it applys to multiple draws of a sample from a population. Specifically we will look at how `r observations` means of draws of sample of size `r observations` random exponential numbers with a lambda of `r lambda` compares to `r trials` random normal observations. The random normal numbers will have a mean and standard deviation equivilant to the theoretical mean and standard deviation that we would expect for the exponential numbers. The mean and standard deviation of the population of eponential numbers are both equal to $\frac{1}{\lambda}$ or in ths case equal to `r 1/lambda`. The theoretical standard deviation of the sample will be equal to $\frac{\sigma}{\sqrt{`r observations`}}$ on in this case `r (1/lambda)/sqrt(observations)`. The actuall mean of the `r trials` means of `r observations` exponential numbers is `r mean(expn)` and the standard deviation is `r sd(expn)` show that the observed values are representitive of the population according to the Central Limit Therom.
 
+# Introduction 
+In this experiment we will be comparing the distribution of the of `r trials`  means of samples of `r observations` exponential numbers to their expected distribution through the use of the central limit therom. The poultaion of exponential numbers will have a mean and standard deviation of $\frac{1}{\lambda}$ or $\frac{1}{0.2}=`r 1/lambda`$. The standard deviation of the sample will be equal to $\frac{\sigma}{\sqrt{`r observations`}}$ on in this case `r (1/lambda)/sqrt(observations)`.
 
+# Calculations
+Upon sampling the exponential numbers we can start comparing them to the expected values. The expected mean of the samples is `r exmean` while the observed mean is `r acmean`. The expected standard deviation is `r exsigma` and the observed standard deviation is `r acsigma`. With the observed mean and standard deviation so close to the expected mean and standard deviation we can see that the central limit therom governs this dataset
+
+```{r graph_expn, echo=FALSE}
+xdf <- data.frame(expn)
+x <- ggplot(xdf,aes(x=expn))
+x + geom_histogram(aes(fill = ..count..)) + geom_vline(xintercept = mean(expn), color='red') + geom_vline(xintercept = 1/lambda, color='black') + ggtitle('Expected Mean (black) vs. Actual Mean (red)' )
+```
+
+# Appendix
+
+## Loading Data
+Here we set the seed to verify the reproducibility of the results. Set the variables according to the experiment. And create two samples; one for `r trials` of the mean of `r observations` exponential numbers, and one for `r trials` of normal numbers that have a mean and sd equal to the exponential numbers.
+```{r show.load.data, ref.label='load.data'}
+```
