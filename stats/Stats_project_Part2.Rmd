@@ -1,0 +1,7 @@
+---
+title: "Stats_Project_2"
+author: "jmtaysom"
+date: "05/23/2015"
+output: pdf_document
+---
+
