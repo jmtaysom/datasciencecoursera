@@ -1,7 +1,97 @@
 ---
-title: "Stats_Project_2"
+title: "Exploration of Tooth Growth Data"
 author: "jmtaysom"
 date: "05/23/2015"
 output: pdf_document
 ---
+# Executive Summary
+Based on the results of the Tooth Growth dataset it can be said that as the subjects recieved higher doses of vitamin c the length of their teeth increased. At the dosage levels of 0.5 and 1.0 mg orange juice induced longer tooth length than ascorbic acid. At the 2.0 dosage the difference between the two was statistically insignificant. For both orange juice and ascorbic acid as the dose increased so did the length of the tooth.
+
+# Introduction
+The tooth growth dataset is a standard dataset that comes in the datasets library of R. It is the results of the "The Effect of Vitamin C on Tooth Growth in Guinea Pigs" and is descibed as "The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid)."
+
+```{r Load.library, echo=FALSE, results='hide'}
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(datasets)
+```
+```{r Load.data, echo=FALSE, results='hide'}
+tg <- ToothGrowth
+
+#Subsetting the data
+OJ <- subset(tg, supp=='OJ')
+VC <- subset(tg, supp=='VC')
+tg.05 <-subset(tg, dose==0.5)
+tg.10 <-subset(tg, dose==1.0)
+tg.20 <-subset(tg, dose==2.0)
+```
+# Summary of the dataset
+The data shows that as the the dosage of vitamin c increases so dose the mean length of the teeth (see table 1). At the lower two dosage levels the length of teeth had more variation for orange juice than ascorbic acid but the reverse is true at the 2.0 mg dosage. Both of these are visible in the histogram below.
+```{r summary.mean, echo=FALSE, results='hide'}
+# Summaries of the means of the data by each unique group
+aggregate(tg$len,by=list(tg$sup, factor(tg$dose)), mean)
+```
+```{r summary.sd, echo=FALSE, results='hide'}
+# Summaries of the standard deviations of the data by each unique group
+aggregate(tg$len,by=list(tg$sup, factor(tg$dose)), sd)
+```
+
+```{r plot_comparison, echo=FALSE, fig.height=4}
+# Plot the six groups
+OJplot <- ggplot(OJ, aes(x=len, fill=as.character(dose))) + geom_histogram() + ggtitle('OJ')
+VCplot <- ggplot(VC, aes(x=len, fill=as.character(dose))) + geom_histogram() + ggtitle('VC')
+
+grid.arrange(OJplot, VCplot, nrow=2, main='Comparision of Vitamin C sources')
+```
+
+# Interpreting the T-tests
+1. When comparing orange juice to ascorbic acid at the 0.5 mg dosage we find that orange juice is correlated with longer tooth length than ascorbic acid. The test resulted in a p-value of 0.0053 and a 95% confidence interval of 1.77 - 8.73 longer teeth. This is statistically significant.
+2. When comparing orange juice to ascorbic acid at the 1.0 mg dosage we find that orange juice is correlated with longer tooth length than ascorbic acid. The test resulted in a p-value of 0.0008 and a 95% confidence interval of 2.84 - 9.02 longer teeth. This is statistically significant.
+3. When comparing orange juice to ascorbic acid at the 2.0 mg dosage we find that orange juice is correlated with longer tooth length than ascorbic acid. The test resulted in a p-value of 0.96 and a 95% confidence interval of -3.72 - 3.56 longer teeth. This is not statistically significant.
+4. When comparing orange juice to ascorbic acid at all dosage levels we find that orange juice is correlated with longer tooth length than ascorbic acid. The test resulted in a p-value of 0.06 and a 95% confidence interval of -0.17 - 7.57 longer teeth. This is not statistically significant at the 95% level but would be at the 90% level. The statistical insignicance of the difference of the 2.0 mg dosage is masking the significance at the other levels.
+5. When comparing orange juice between the 1.0 mg dosage and 0.5 mg dosage we find that the 1.0 mg is correlated with longer tooth length than 0.5 mg dosage. The test resulted in a p-value of 0.00008 and a 95% confidence interval of 5.53 - 13.41 longer teeth. This is statistically significant.
+6. When comparing orange juice between the 2.0 mg dosage and 1.0 mg dosage we find that the 2.0 mg is correlated with longer tooth length than 1.0 mg dosage. The test resulted in a p-value of 0.037 and a 95% confidence interval of 6.32 - 11.26 longer teeth. This is statistically significant.
+7. When comparing ascorbic acid between the 1.0 mg dosage and 0.5 mg dosage we find that the 1.0 mg is correlated with longer tooth length than 0.5 mg dosage. The test resulted in a p-value of 0.0000006 and a 95% confidence interval of 6.32 - 11.26 longer teeth. This is statistically significant.
+8.  When comparing ascorbic acid between the 2.0 mg dosage and 1.0 mg dosage we find that the 2.0 mg is correlated with longer tooth length than 1.0 mg dosage. The test resulted in a p-value of 0.00003 and a 95% confidence interval of 5.77 - 12.97 longer teeth. This is statistically significant.
+
+```{r Ttests, echo=FALSE, results='hide'}
+# 1. Comparing Orange Juice to Ascorbic Acid at 0.5 mg dose
+t.test(tg.05$len[tg.05$supp=="OJ"], tg.05$len[tg.05$supp=="VC"], var.equal=T, paired=F)
+# 2. Comparing Orange Juice to Ascorbic Acid at 1.0 mg dose
+t.test(tg.10$len[tg.10$supp=="OJ"], tg.10$len[tg.10$supp=="VC"], var.equal=T, paired=F)
+# 3. Comparing Orange Juice to Ascorbic Acid at 2.0 mg dose
+t.test(tg.20$len[tg.20$supp=="OJ"], tg.20$len[tg.20$supp=="VC"], var.equal=T, paired=F)
+# 4. Comparing Orange Juice to Ascorbic Acid for all doses
+t.test(OJ$len, VC$len, var.equal=T, paired=F)
+# 5. Comparing 1.0 mg dose to 0.5 mg dose for orange juice
+t.test(OJ$len[OJ$dose==1.0], OJ$len[OJ$dose==0.5],var.equal=T, paired=F)
+# 6. Comparing 2.0 mg dose to 1.0 mg dose for orange juice
+t.test(OJ$len[OJ$dose==2.0], OJ$len[OJ$dose==1.0],var.equal=T, paired=F)
+# 7. Comparing 1.0 mg dose to 0.5 mg dose for asorbic acid
+t.test(VC$len[VC$dose==1.0], VC$len[VC$dose==0.5],var.equal=T, paired=F)
+# 8. Comparing 2.0 mg dose to 1.0 mg dose for ascorbic acid
+t.test(VC$len[VC$dose==2.0], VC$len[VC$dose==1.0],var.equal=T, paired=F)
+```
+
+# Appendix
+## Required libraries
+```{r show.library, ref.label='Load.library'}
+```
+## Load the data
+```{r show.data, ref.label='Load.data', results='hide'}
+```
+## Summary of the data
+### Table 1
+```{r show.summary.mean, ref.label='summary.mean'}
+```
+### Table 2
+```{r show.summary.sd, ref.label='summary.sd'}
+```
+## Plot the data
+```{r show_plot, ref.label='plot_comparison', fig.keep='none'}
+```
+## T-tests
+```{r show.Ttest, ref.label='Ttests'}
+```
 
