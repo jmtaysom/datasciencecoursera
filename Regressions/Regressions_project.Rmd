@@ -19,6 +19,7 @@ allfit <- lm(mpg~., data=mtcars)
 all.coef <- summary(allfit)$coefficients[,4]
 
 wt.anova <- anova(fit,fit2)
+wt.anova.p <- as.character(wt.anova$"Pr(>F)"[2])
 ```
 
 
@@ -37,6 +38,38 @@ all.coef
 ```
 When looking at the p values above the lowest one identified was wt or weight of the car in 1,000 lbs. So a linear model predicting gas milage by transmission type and weight was created and compared to the original model. Now when the effect of switching from an automatic transmission to a manual transmission is `r coef(fit2)[2]`. So the effect is quite small an with a p value of .988 is no longer statistically significant. 
 
+Now it is import to check if adding weight to the linear regression was statistically significant. Through the use of an Anova Table there are several things that show the adding weight is important in understanding the effects of transmission type. The first is that the p value for adding weight to the model is `r wt.anova.p` signifying that it is statistically import to include wt in a linear regression that is predicting the gas milage of a car. Second looking at the residual sum of squares of the original model `r wt.anova$RSS[1]` compared to the new model `r  wt.anova$RSS[2]` the decrease indicates that the new model has a better fit than the old model.
+
+In order to veriify that this model is not being overly influenced by outliers a plot of Residuals vs Leverage was created (figure 4). In this plot all of the points fall under the Cook's Distance indicating that none of the points are influencing the model excessively.
+
+#Summary
+The analysis shows that switching from an average automatic car to an average manual car will increase gas milage by `r cf[2]` but that is because that the average manual car is lighter and not that manual transmissions are more fuel efficient than automatic cars.
+
+
+#Appendix
+Summary of the linear regression predicting gas milage by transmission type
+```{r echo=FALSE}
+summary(fit)
+```
+Figure 1
 
 
 
+Summary of the linear regression predicting gas milage by transmission type and weight
+```{r echo=FALSE}
+summary(fit2)
+```
+Figure 2
+
+
+
+Anova Table comparing the models that include transmission type only vs transmission type and weight.
+```{r}echo=FALSE
+wt.anova
+```
+Figure 3
+
+```{r echo=FALSE}
+plot(fit2, which=5)
+```
+Figure 4
