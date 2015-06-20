@@ -1,0 +1,42 @@
+---
+title: "Regression Course Proejct"
+author: "jmtaysom"
+date: "06/19/2015"
+output: pdf_document
+---
+
+```{r load.library, echo=FALSE, results='hide'}
+data(mtcars)
+library(ggplot2)
+```
+```{r load.data, echo=FALSE, results='hide'}
+fit <- lm(mpg~am,mtcars)
+cf <- coef(fit)
+fit2 <- lm(mpg~am+wt, mtcars)
+cf2 <- coef(fit2)
+
+allfit <- lm(mpg~., data=mtcars)
+all.coef <- summary(allfit)$coefficients[,4]
+
+wt.anova <- anova(fit,fit2)
+```
+
+
+#Executive summary
+Although on average the cars with manual transmissions get better gas milage than those with automatic transmissions it is because those cars have smaller engines and are lighter weight than those that have automatic transmissions. There is no statistical significance to the difference gas milage between the two transmission types.
+
+#Introduction
+The Motor Trend Car Road Tests dataset "was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models)." In this study the question of whether or not manual transmission cars get better gas milage than automatic transmission cars and what is the quantity of that difference if it exists.
+
+#Analysis
+The intial question can be answered by creating a linear regression comparing cars with automatic transmissions and manual transmissions. The linear model has an intercept of `r cf[1]` and a slope of `r cf[2]` which translates into automatic cars having an average mpg of `r cf[1]` and by switching to a manual you will get a `r cf[2]` increase in mpg. This increase is deemed statistically significant. It does not look at any of the other differences between the two cars. This linear model only accounts for `r summary(fit)$r.squared *100` percent of the variation between automatic and manual cars based on the r squared value of the model.
+
+In order to see what other factors might affect the gas milage of vehicles a linear regression was created comparing mpg to all other variables. From that the variable that had the highest p value was identified to see how adding it to the original model would change the outcome of the original findings.
+```{r echo=FALSE}
+all.coef
+```
+When looking at the p values above the lowest one identified was wt or weight of the car in 1,000 lbs. So a linear model predicting gas milage by transmission type and weight was created and compared to the original model. Now when the effect of switching from an automatic transmission to a manual transmission is `r coef(fit2)[2]`. So the effect is quite small an with a p value of .988 is no longer statistically significant. 
+
+
+
+
