@@ -1,0 +1,69 @@
+---
+title: "Predicting Correct Lifting"
+author: "jmtaysom"
+date: "October 24, 2015"
+output: html_document
+---
+## Predicting Correct Lifting
+This project uses data from 6 participants who lifted barbells in 5 different ways, one of them being correct, to be able to predict if the correct form is being used in future lifting measurements. This model uses a Random Forest to identify the correct method of identification of lifting technique. The data source is http://groupware.les.inf.puc-rio.br/har
+
+## Data Processing
+Load require libraries
+```{r, cache}
+library(caret)
+library(ElemStatLearn)
+```
+
+Download and read in data
+```{r, cache=TRUE}
+setwd("/home/jmtaysom/datasciencecoursera/Machine Learning/")
+trainingURL <- 'https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv'
+testingURL <- 'https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv'
+download.file(trainingURL,'pml_training.csv',method='wget')
+download.file(testingURL,'pml_testing.csv',method='wget')
+training <- read.csv('pml_training.csv', na.strings = c('NA', "NULL","", " "))
+testing <- read.csv('pml_testing.csv')
+```
+
+Clean up data so that the training and testing data are in the same format
+```{r}
+nona_training <- sapply(training, function(x)all(!is.na(x)))
+train.data <- training[,nona_training]
+train.data <- train.data[,8:59]
+train.classe <- training[,160]
+test.data <-testing[,nona_training]
+test.data <- test.data[,8:59]
+```
+
+Set the seed and create a Random Forest to predict the outcomes
+```{r, cache=TRUE}
+set.seed(1010101)
+rf <- train(train.data,train.classe, method='rf')
+testpredict <-predict(rf,test.data)
+```
+
+
+```{r, echo=FALSE}
+# This section is used to create the output to submit for the class.
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+pml_write_files(testpredict)
+```
+
+Examine the model
+```{r}
+print(rf)
+```
+The model was bootstrapped 25 times using 52 predictors on 19622 samples to predict the five different lifting techniques. The model found that using 2 predictors at each node in the tree had the greatest accuracy at `r rf$results$Accuracy[1]*100`% with a standard deviation of `r rf$results$AccuracySD[1]`.
+
+```{r}
+print(rf$finalModel)
+```
+The results of the final model have an out of bag estimate of error rate of 0.45% from the creation of 500 trees each using 2 variables at each split. Because the model is a Random Forest there is no need to do external cross-validation. From Berkleys explanation of the Random Forest model "In random forests, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows: Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree." - http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#ooberr
+
+Upon testing the model correctly predicted 20 out of 20 test samples. Which is to be expected with the error rate of the model being so low and only having a small number of test samples.
