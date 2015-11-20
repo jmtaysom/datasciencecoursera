@@ -14,7 +14,12 @@ shinyUI(fluidPage(
                    c("3d6" = 3,
                      "4d6" = 4,
                      "5d6" = 5)),
-      actionButton('button','Roll?')
+      actionButton('button','Roll?'),
+      p('If you are just getting started with D&D you can use this
+         to help you roll up a character. Likely you will be rolling
+         4d6 for your stats but if you are in a high-powered campaign
+         you may use 5d6 or 3d6 in a low-powered campaign. Just hit
+         roll and take a look at your stats to the right.')
     ),
     
     # Show a plot of the generated distribution
